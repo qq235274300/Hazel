@@ -9,6 +9,12 @@
 #include "Hazel/LayerStack.h"
 #include "Events/ApplicationEvent.h"
 
+#include "Hazel/ImGui/ImGuiLayer.h"
+#include "Hazel/Renderer/Shader.h"
+#include "Hazel/Renderer/Buffer.h"
+#include "Hazel/Renderer/VertexArray.h"
+
+#include "Hazel/Renderer/OrthographicCamera.h"
 
 namespace Hazel
 {
@@ -32,8 +38,13 @@ namespace Hazel
 		
 		std::unique_ptr<Window> m_Window;
 		bool m_Running = true;
-		
+		ImGuiLayer* m_ImGuiLayer;
 		LayerStack m_LayerStack;
+
+		//Timestep
+		float LastFrameTime = 0.f;
+		
+		
 	private:
 		static Application* m_Instance;
 	};

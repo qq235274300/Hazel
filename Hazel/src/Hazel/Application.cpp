@@ -2,9 +2,13 @@
 #include "Application.h"
 
 #include "Hazel/Log.h"
+#include "Hazel/Input.h"
+#include "Hazel/Core/Timestep.h"
 
+#include "Hazel/Renderer/Renderer.h"
 
 #include <glad/glad.h>
+#include <GLFW/glfw3.h>
 
 namespace Hazel
 {
@@ -12,12 +16,20 @@ namespace Hazel
 	
 	 Application*  Application::m_Instance  = nullptr;
 	
+
+	
 	Application::Application()
 	{
 		HZ_CORE_ASSERT(!m_Instance, "Application Already exist!");
 		m_Instance= this;
 		m_Window = std::unique_ptr<Window>(Window::Create());
 		m_Window->SetEventCallback(BIND_EVENT_FN(OnEvent));	
+		m_Window->SetVsync(true);
+
+		m_ImGuiLayer = new ImGuiLayer();
+		PushOverlay(m_ImGuiLayer);
+
+		
 	}
 	Application::~Application()
 	{
@@ -26,16 +38,26 @@ namespace Hazel
 	void Application::Run()
 	{	
 		while (m_Running)
-		{
+		{		
+			//计算每帧花费时间
+			float time = (float)glfwGetTime();
+			Timestep ts = time - LastFrameTime;
+			LastFrameTime = time;
 			
-				glClearColor(1, 0, 1, 1);
-				glClear(GL_COLOR_BUFFER_BIT);
-				//Update
-				for (Layer* layer : m_LayerStack)
-				{
-					layer->OnUpdate();
-				}
-				m_Window->OnUpdate();			
+			for (Layer* layer : m_LayerStack)
+			{
+				layer->OnUpdate(ts);
+			}
+			//To do in RenderThread;
+			m_ImGuiLayer->Begin();
+			for (Layer* layer : m_LayerStack)
+			{
+				layer->OnImGuiRender();
+			}
+			m_ImGuiLayer->End();
+
+
+			m_Window->OnUpdate();			
 		};
 	}
 
