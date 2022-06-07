@@ -11,6 +11,8 @@ namespace Hazel {
 	class Renderer
 	{
 	public:
+		static void Init();
+
 		static void BeginScene(OrthographicsCamera& camera);
 		static void EndScene();
 		//目前一次渲染命令传递了材质(Shader),对象数据 最终传递一个模型即可

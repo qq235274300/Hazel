@@ -22,10 +22,16 @@ namespace Hazel
 	{
 		HZ_CORE_ASSERT(!m_Instance, "Application Already exist!");
 		m_Instance= this;
+
+		//Create Window
 		m_Window = std::unique_ptr<Window>(Window::Create());
 		m_Window->SetEventCallback(BIND_EVENT_FN(OnEvent));	
 		m_Window->SetVsync(true);
 
+		//Set Renderer Porperties
+		Renderer::Init();
+
+		//Create Layer
 		m_ImGuiLayer = new ImGuiLayer();
 		PushOverlay(m_ImGuiLayer);
 

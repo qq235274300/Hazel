@@ -72,7 +72,7 @@ public:
 			}
 		)";
 
-		m_Shader.reset( Hazel::Shader::Create(vertexSrc, fragmentSrc));
+		m_Shader =  Hazel::Shader::Create("Triangle", vertexSrc, fragmentSrc);
 
 		//Try Render another VAO
 		{
@@ -128,13 +128,13 @@ public:
 			}
 		)";
 
-			m_Float4Shader.reset(Hazel::Shader::Create(float4ShaderVertexSrc, float4ShaderFragmentSrc));
+			m_Float4Shader = Hazel::Shader::Create("UniformSuqare", float4ShaderVertexSrc, float4ShaderFragmentSrc);
 
 //*********** This Shader using to render GridUniform Square **********************
 
 
 //*********** This Shader using to render Texture Square **********************
-			std::string TexShaderVertexSrc = R"(
+			/*std::string TexShaderVertexSrc = R"(
 			#version 330 core
 			
 			layout(location = 0) in vec3 a_Position;
@@ -164,18 +164,20 @@ public:
 				color = texture(u_Texture,v_TexCoord);
 				
 			}
-		)";
+		)";*/
 
-		m_TexShader.reset(Hazel::Shader::Create(TexShaderVertexSrc, TexShaderFragmentSrc));
+		//m_TexShader = Hazel::Shader::Create("assets/shaders/Texture.glsl");
 		
 //*********** This Shader using to render Texture Square **********************
 
 
 		}
-
-		m_Texture2D = Hazel::Texture2D::Create("assets/textures/Checkerboard.png");
+		auto m_TexShader = m_ShaderLib.Load("assets/shaders/Texture.glsl");
+		m_TexCheckboard = Hazel::Texture2D::Create("assets/textures/Checkerboard.png");
+		m_TexCherno = Hazel::Texture2D::Create("assets/textures/ChernoLogo.png");
 		//std::dynamic_pointer_cast<Hazel::OpenGLShader>(m_TexShader)->Bind();
 		std::dynamic_pointer_cast<Hazel::OpenGLShader>(m_TexShader)->UploadUniformInt1("u_Texture", 0);
+	
 	}
 
 	void OnUpdate(Hazel::Timestep ts)override
@@ -256,7 +258,12 @@ public:
 			}
 		}
 		//Render Square From Tex
-		m_Texture2D->Bind();
+		auto m_TexShader = m_ShaderLib.Get("Texture");
+
+		m_TexCheckboard->Bind();
+		Hazel::Renderer::Submit(m_TexShader, m_SquareVA, glm::scale(glm::mat4(1.f), glm::vec3(1.5f)));
+
+		m_TexCherno->Bind();
 		Hazel::Renderer::Submit(m_TexShader, m_SquareVA, glm::scale(glm::mat4(1.f), glm::vec3(1.5f)));
 
 		//Render Triangle
@@ -280,13 +287,15 @@ public:
 	}
 
 private:
+	Hazel::ShaderLibrary m_ShaderLib;
 	Hazel::Ref<Hazel::Shader> m_Shader;
 	Hazel::Ref<Hazel::VertexArray> m_VertexArray;
 
-	Hazel::Ref<Hazel::Shader> m_Float4Shader,m_TexShader;
+	Hazel::Ref<Hazel::Shader> m_Float4Shader;
 	Hazel::Ref<Hazel::VertexArray> m_SquareVA;
 
-	Hazel::Ref<Hazel::Texture2D> m_Texture2D;
+	Hazel::Ref<Hazel::Texture2D> m_TexCheckboard;
+	Hazel::Ref<Hazel::Texture2D> m_TexCherno;
 
 	Hazel::OrthographicsCamera m_Camera;
 	
